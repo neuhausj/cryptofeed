@@ -211,6 +211,8 @@ class Binance(Feed, BinanceRestMixin):
         pair = self.exchange_symbol_to_std_symbol(msg['s'])
         bid = Decimal(msg['b'])
         ask = Decimal(msg['a'])
+        bidPrice = Decimal(msg['B'])
+        askPrice = Decimal(msg['A'])
 
         # Binance does not have a timestamp in this update, but the two futures APIs do
         if 'E' in msg:
@@ -218,7 +220,7 @@ class Binance(Feed, BinanceRestMixin):
         else:
             ts = timestamp
 
-        t = Ticker(self.id, pair, bid, ask, ts, raw=msg)
+        t = Ticker(self.id, pair, bid, ask, ts, bidPrice, askPrice, raw=msg)
         await self.callback(TICKER, t, timestamp)
 
     async def _liquidations(self, msg: dict, timestamp: float):
