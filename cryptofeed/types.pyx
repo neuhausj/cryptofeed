@@ -78,11 +78,15 @@ cdef class Ticker:
     cdef readonly object ask
     cdef readonly object timestamp
     cdef readonly object raw
+    cdef readonly object bidPrice
+    cdef readonly object askPrice
 
-    def __init__(self, exchange, symbol, bid, ask, timestamp, raw=None):
+    def __init__(self, exchange, symbol, bid, ask, timestamp, bidPrice=None, askPrice=None, raw=None):
         assert isinstance(bid, Decimal)
         assert isinstance(ask, Decimal)
         assert timestamp is None or isinstance(timestamp, float)
+        assert bidPrice is None or isinstance(bidPrice, Decimal)
+        assert askPrice is None or isinstance(askPrice, Decimal)
 
         self.exchange = exchange
         self.symbol = symbol
@@ -90,19 +94,21 @@ cdef class Ticker:
         self.ask = ask
         self.timestamp = timestamp
         self.raw = raw
+        self.bidPrice = bidPrice
+        self.askPrice = askPrice
 
     cpdef dict to_dict(self, numeric_type=None, none_to=False):
         if numeric_type is None:
-            data = {'exchange': self.exchange, 'symbol': self.symbol, 'bid': self.bid, 'ask': self.ask, 'timestamp': self.timestamp}
+            data = {'exchange': self.exchange, 'symbol': self.symbol, 'bid': self.bid, 'ask': self.ask, 'timestamp': self.timestamp, 'bidPrice': self.bidPrice, 'askPrice': self.askPrice}
         else:
-            data = {'exchange': self.exchange, 'symbol': self.symbol, 'bid': numeric_type(self.bid), 'ask': numeric_type(self.ask), 'timestamp': self.timestamp}
+            data = {'exchange': self.exchange, 'symbol': self.symbol, 'bid': numeric_type(self.bid), 'ask': numeric_type(self.ask), 'timestamp': self.timestamp, 'bidPrice': self.bidPrice, 'askPrice': self.askPrice}
         return data if not none_to else convert_none_values(data, none_to)
 
     def __repr__(self):
-        return f"exchange: {self.exchange} symbol: {self.symbol} bid: {self.bid} ask: {self.ask} timestamp: {self.timestamp}"
+        return f"exchange: {self.exchange} symbol: {self.symbol} bid: {self.bid} ask: {self.ask} timestamp: {self.timestamp} bidPrice: {self.bidPrice} askPrice: {self.askPrice}"
 
     def __eq__(self, cmp):
-        return self.exchange == cmp.exchange and self.symbol == cmp.symbol and self.bid == cmp.bid and self.ask == cmp.ask and self.timestamp == cmp.timestamp
+        return self.exchange == cmp.exchange and self.symbol == cmp.symbol and self.bid == cmp.bid and self.ask == cmp.ask and self.timestamp == cmp.timestamp and self.bidPrice == cmp.bidPrice and self.askPrice == cmp.askPrice
 
     def __hash__(self):
         return hash(self.__repr__())
